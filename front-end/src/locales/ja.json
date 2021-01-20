@@ -1,0 +1,44 @@
+{
+    "common": {
+        "language": "言語",
+        "edit": "編集",
+        "month": "月",
+        "cancel": "キャンセル",
+        "invite": "招待",
+        "reInvite": "再招待",
+        "decided": "決定",
+        "applying": "申請中",
+        "note": "メモ",
+        "delete": "取り消す",
+        "setting": "設定",
+        "recruiter": "リクルーター",
+        "worker": "ワーカー",
+        "email": "Eメール",
+        "password": "パスワード",
+        "close": "閉じる",
+        "saved": "保存しました",
+        "failed_to_save": "保存に失敗しました",
+        "updated": "更新しました",
+        "failed_to_update": "更新に失敗しました",
+        "do_you_delete": "削除しますか？",
+        "deleted": "削除しました",
+        "failed_to_delete": "削除に失敗しました",
+        "noResult": "該当結果が見つかりませんでした",
+        "terms_of_use": "利用規約",
+        "privacy_policy": "プライバシーポリシー",
+        "required": "必要！",
+        "failed": "失敗しました",
+        "failed_to_sent": "送付に失敗しました"
+      },
+      "error": {
+        "response": {
+          "400": "サーバーエラーが発生しました",
+          "401": "認証エラーが発生しました",
+          "500": "サーバーエラーが発生しました"
+        },
+        "request": {
+          "network": "通信エラーが発生しました",
+          "unexpected": "予期しない通信が発生しました"
+        }
+      }
+}
