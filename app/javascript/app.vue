@@ -1,17 +1,17 @@
 <template>
-  <v-app>
-    <v-content class="mt-md-6">
+  <v-app id="app">
+    <v-main class="mt-md-6">
       <router-view />
       <v-btn @click="showError()">Show Error</v-btn>
       <v-btn @click="show()">Show</v-btn>
-    </v-content>
+    </v-main >
     <GlobalToast />
   </v-app>
 </template>
 
 <script>
-import GlobalToast from "@/components/GlobalToast";
-import i18n from "@/plugins/i18n";
+import GlobalToast from "./packs/components/GlobalToast";
+import i18n from "./packs/plugins/i18n";
 
 export default {
   name: "App",
