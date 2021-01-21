@@ -1,0 +1,45 @@
+{
+  "common": {
+      "babo": "BABO",
+      "language": "Language",
+      "edit": "Edit",
+      "month": "Month",
+      "cancel": "Cancel",
+      "invite": "Invite",
+      "reInvite": "Re-invite",
+      "decided": "Decided",
+      "applying": "Applying",
+      "note": "Note",
+      "delete": "Delete",
+      "setting": "Setting",
+      "recruiter": "Recruiter",
+      "worker": "Worker",
+      "email": "Email",
+      "password": "Password",
+      "close": "Close",
+      "saved": "Saved",
+      "failed_to_save": "Failed to save",
+      "updated": "Updated",
+      "failed_to_update": "Failed to update",
+      "do_you_delete": "Do you delete?",
+      "deleted": "Deleted",
+      "failed_to_delete": "Failed to delete",
+      "noResult": "There were no results found.",
+      "terms_of_use": "Terms of use",
+      "privacy_policy": "Privacy policy",
+      "required": "Required!",
+      "failed": "Failed!",
+      "failed_to_sent": "Failed to sent"
+    },
+  "error": {
+    "response": {
+      "400": "Server error happens",
+      "401": "Authentication error happens",
+      "500": "Server error happens"
+    },
+    "request": {
+      "network": "Network is not connected",
+      "unexpected": "Unexpected request throws"
+    }
+  }
+}
