@@ -1,6 +1,7 @@
 <template>
   <v-app id="app">
-    <v-main class="mt-md-6">
+    <Header/>
+    <v-main class="mt-12">
       <router-view />
       <v-btn @click="showError()">Show Error</v-btn>
       <v-btn @click="show()">Show</v-btn>
@@ -12,7 +13,7 @@
 <script>
 import GlobalToast from "./packs/components/GlobalToast";
 import i18n from "./packs/plugins/i18n";
-
+import Header from "./packs/components/shared/Header"
 export default {
   name: "App",
   data: () => ({
@@ -25,6 +26,7 @@ export default {
   }),
   components: {
     GlobalToast,
+    Header
   },
   methods: {
     show() {
@@ -48,6 +50,24 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+
+p {
+  margin-bottom : 0 !important;
+}
+
+.clickable{
+  cursor: pointer;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar--hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar--hidden {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 </style>
