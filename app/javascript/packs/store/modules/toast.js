@@ -1,7 +1,7 @@
 const state = {
     message: "",
     color: "success",
-    timeout: 1000
+    timeout: 3000
   };
   
   const getters = {

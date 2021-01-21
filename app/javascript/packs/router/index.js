@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 const HomePage = () => import(/* webpackChunkName: "Home" */ "../views/HomePage");
+
 Vue.use(VueRouter);
 
 const routes = [
