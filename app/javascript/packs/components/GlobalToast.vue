@@ -1,5 +1,5 @@
 <template>
-  <v-snackbar v-model="toast" :color="color" :timeout="timeout" left transition="scroll-x-reverse-transition">
+  <v-snackbar v-model="toast" :color="color" :timeout="timeout" left>
     {{ message }}
     <template v-slot:action="{ attrs }">
         <v-btn

@@ -60,7 +60,7 @@
           x-large
           block
           :disabled="!valid"
-          color="success"
+          class="orange white--text"
           @click="validate"
           >{{ $t("common.register") }}</v-btn
         >
