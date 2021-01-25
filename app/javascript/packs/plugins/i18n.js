@@ -61,11 +61,11 @@ const numberFormats = {
 };
 
 const i18n = new VueI18n({
-  locale: "ja",
+  locale: "en",
   messages,
   dateTimeFormats,
   numberFormats,
-  fallbackLocale: "en"
+  fallbackLocale: "ja"
 });
 
 export default new VueI18n(i18n);

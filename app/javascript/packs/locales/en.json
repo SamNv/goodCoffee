@@ -1,6 +1,8 @@
 {
   "common": {
-      "babo": "BABO",
+      "header_title": "GOOD CAFFE",
+      "login": "Login",
+      "register": "Register",
       "language": "Language",
       "edit": "Edit",
       "month": "Month",
