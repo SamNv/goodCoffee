@@ -1,7 +1,8 @@
 const state = {
     message: "",
     color: "success",
-    timeout: 3000
+    timeout: 3000,
+    index: 1
   };
   
   const getters = {
@@ -13,6 +14,9 @@ const state = {
     },
     timeout(state) {
       return state.timeout;
+    },
+    index(state) {
+      return state.index;
     }
   };
   
@@ -20,11 +24,13 @@ const state = {
     show(state, { message }) {
       state.message = message;
       state.color = "success";
+      state.index +=1;
       state.timeout = 3000;
     },
     showError(state, { message }) {
       state.message = message;
       state.color = "error";
+      state.index +=1;
       state.timeout = 0;
     },
     hide(state) {
