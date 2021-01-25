@@ -3,17 +3,17 @@
     <v-row>
       <v-col cols="12">
         <v-text-field
-          v-model="loginEmail"
-          :rules="loginEmailRules"
+          v-model="email"
+          :rules="emailRules"
           label="E-mail"
           required
         ></v-text-field>
       </v-col>
       <v-col cols="12">
         <v-text-field
-          v-model="loginPassword"
+          v-model="password"
           :append-icon="show1 ? 'eye' : 'eye-off'"
-          :rules="[rules.required, rules.min]"
+          :rules="[requireRules(), minRules(8)]"
           :type="show1 ? 'text' : 'password'"
           name="input-10-1"
           label="Password"
@@ -31,7 +31,7 @@
           block
           :disabled="!valid"
           class="orange white--text"
-          @click="validate"
+          @click="signin"
         >
           {{ $t("common.login") }}
         </v-btn>
@@ -41,25 +41,42 @@
 </template>
 
 <script>
+import { emailRules, requireRules, minRules } from "../../constants/rules";
 export default {
+  created: function() {
+    this.emailRules = emailRules;
+    this.requireRules = requireRules;
+    this.minRules = minRules;
+  },
   data: () => ({
     valid: true,
     show1: false,
-    loginPassword: "",
-    loginEmail: "",
-    loginEmailRules: [
-      (v) => !!v || "Required",
-      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
-    ],
-    rules: {
-      required: (value) => !!value || "Required.",
-      min: (v) => (v && v.length >= 8) || "Min 8 characters",
-    },
+    password: "",
+    email: "",
+    // rules: {
+    //   required: (value) => !!value || "Required.",
+    //   min: (v) => (v && v.length >= 8) || "Min 8 characters",
+    // },
   }),
   methods: {
-    validate() {
+    async signin() {
       if (this.$refs.loginForm.validate()) {
-        // submit form to server/API here...
+        try {
+          const data = { email: this.email, password: this.password };
+          await this.$store.dispatch("auth/login", data);
+          this.$store.dispatch("toast/show", {
+            message: "You have been logged in",
+          });
+          this.email = "";
+          this.password = "";
+          //Close modal
+          this.$emit("changeDialog", false);
+        } catch (e) {
+          this.$store.dispatch("toast/showError", {
+            message: "Incorrect email or password.",
+          });
+        } finally {
+        }
       }
     },
     reset() {

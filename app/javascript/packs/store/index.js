@@ -9,7 +9,8 @@ const modules = {};
 // Dynamically import and namespace Vuex modules
 const moduleNames = [
   "home",
-  "toast"
+  "toast",
+  "auth"
 ];
 
 moduleNames.forEach(name => {

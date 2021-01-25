@@ -40,7 +40,7 @@ export default {
   computed: {
     toastIndex() {
       return this.$store.getters["toast/index"];
-    },
+    }
   },
   components: {
     GlobalToast,

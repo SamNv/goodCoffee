@@ -2,14 +2,8 @@
   <v-snackbar v-model="toast" :color="color" :timeout="timeout" left>
     {{ message }}
     <template v-slot:action="{ attrs }">
-        <v-btn
-          text
-          v-bind="attrs"
-          @click="hide"
-        >
-          {{ $t("common.close") }}
-        </v-btn>
-      </template>
+      <v-icon v-bind="attrs" @click="hide" class="mr-2" small>mdi-window-close</v-icon>
+    </template>
   </v-snackbar>
 </template>
 
