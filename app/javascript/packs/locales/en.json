@@ -2,6 +2,7 @@
   "common": {
       "header_title": "GOOD CAFFE",
       "login": "Login",
+      "logout": "Logout",
       "register": "Register",
       "language": "Language",
       "edit": "Edit",

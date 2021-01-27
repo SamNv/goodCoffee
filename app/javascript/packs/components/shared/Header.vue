@@ -17,19 +17,30 @@
           dialog = true;
           tab = 0;
         "
+        v-if="!logined"
       >
         {{ $t("common.login") }}
       </p>
 
       <p
-        class="clickable ml-4 d-none d-sm-flex"
+        class="ml-4 d-none d-sm-flex clickable"
         dark
         @click.stop="
           dialog = true;
           tab = 1;
         "
+        v-if="!logined"
       >
         {{ $t("common.register") }}
+      </p>
+
+      <p
+        class="clickable ml-4 d-none d-sm-flex"
+        dark
+        v-if="logined"
+        @click="logout"
+      >
+        {{ $t("common.logout") }}
       </p>
 
       <v-badge
@@ -54,9 +65,33 @@
           dialog = true;
           tab = 0;
         "
+        v-if="!logined"
       >
         <v-icon color="white">mdi-account</v-icon>
       </p>
+      <v-menu
+        bottom
+        origin="center center"
+        transition="scale-transition"
+        v-if="logined"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on" class="d-flex d-sm-none">
+            <v-icon color="white">mdi-account</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list class="orange">
+          <v-list-item>
+            <v-list-item-title class="white--text clickable"
+              >Profile</v-list-item-title
+            >
+          </v-list-item>
+          <v-list-item @click="logout">
+            <v-list-item-title class="white--text">Logout</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <v-dialog v-model="dialog" max-width="600px" min-width="360px">
         <div>
           <v-tabs
@@ -75,14 +110,17 @@
             <v-tab-item>
               <v-card class="px-4">
                 <v-card-text>
-                  <LoginForm/>
+                  <LoginForm :dialog="dialog" @changeDialog="dialog = $event" />
                 </v-card-text>
               </v-card>
             </v-tab-item>
             <v-tab-item>
               <v-card class="px-4">
                 <v-card-text>
-                  <RegisterForm/>
+                  <RegisterForm
+                    :dialog="dialog"
+                    @changeDialog="dialog = $event"
+                  />
                 </v-card-text>
               </v-card>
             </v-tab-item>
@@ -90,17 +128,22 @@
         </div>
       </v-dialog>
       <v-dialog v-model="cartModal" max-width="600px" min-width="360px">
-          <Cart/>
+        <Cart />
       </v-dialog>
     </v-toolbar>
   </div>
 </template>
 
 <script>
-import LoginForm from "../authentication/LoginForm"
-import RegisterForm from "../authentication/RegisterForm"
-import Cart from "../cart/index"
+import LoginForm from "../authentication/LoginForm";
+import RegisterForm from "../authentication/RegisterForm";
+import Cart from "../cart/index";
 export default {
+  computed: {
+    logined() {
+      return this.$store.getters["auth/logined"];
+    },
+  },
   data: () => ({
     dialog: false,
     cartModal: false,
@@ -113,8 +156,23 @@ export default {
   components: {
     LoginForm,
     RegisterForm,
-    Cart
-  }
+    Cart,
+  },
+  methods: {
+    async logout() {
+      try {
+        await this.$store.dispatch("auth/logout");
+        this.$store.dispatch("toast/show", {
+          message: "You have been logged out successfully !!",
+        });
+      } catch (e) {
+        this.$store.dispatch("toast/showError", {
+          message: "You cannot log out",
+        });
+        throw e;
+      }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
