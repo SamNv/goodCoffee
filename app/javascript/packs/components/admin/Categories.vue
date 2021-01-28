@@ -9,7 +9,7 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-data-table :headers="headers" :items="products" :search="search">
+    <v-data-table :headers="headers" :items="categories" :search="search">
       <template v-slot:top>
         <v-toolbar flat>
           <v-spacer></v-spacer>
@@ -22,16 +22,10 @@
                 v-on="on"
                 @click="item = {}"
               >
-                New Product
+                New Category
               </v-btn>
             </template>
-            <ProductForm
-              :formTitle="formTitle"
-              :dialog="dialog"
-              @close="dialog = $event"
-              :item="item"
-              :action="action"
-            />
+            <CategoryForm :actionType="actionType" :item="item" />
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
@@ -52,17 +46,6 @@
           </v-dialog>
         </v-toolbar>
       </template>
-      <template v-slot:item.name="{ item }">
-        <div class="d-flex align-center">
-          <v-avatar size="40">
-            <v-img
-              class="product-image"
-              src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
-            ></v-img>
-          </v-avatar>
-          <span class="ml-7"> {{ item.name }}</span>
-        </div>
-      </template>
       <template v-slot:item.actions="{ item }">
         <v-icon small class="mr-2 orange--text" @click="editItem(item)">
           mdi-pencil
@@ -76,89 +59,62 @@
 </template>
 
 <script>
-import ProductForm from "./product/ProductForm";
+import CategoryForm from "../../components/admin/category/CategoryForm";
 export default {
   components: {
-    ProductForm,
+    CategoryForm,
   },
   data: () => ({
     dialog: false,
     dialogDelete: false,
-    search: "",
+    actionType: "new",
     item: {},
-    action: "new",
+
+    search: "",
     headers: [
       {
-        text: "Name",
+        text: "Id",
         align: "start",
         sortable: true,
         filterable: true,
-        value: "name",
+        value: "id",
       },
-      { text: "Price ($)", value: "price" },
-      { text: "Discount", value: "discount" },
+      { text: "Name", value: "name" },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    editedIndex: -1,
-
     defaultItem: {
       name: "",
-      image: 0,
-      discount: 0,
-      price: 0,
     },
-    products: [],
   }),
   mounted() {
-    this.products = this.$store.getters["products/getProducts"];
+    this.$store.dispatch("categories/getCategories");
+    this.$store.dispatch("categories/update", {
+      id: 1,
+      category: { name: "change 2" },
+    });
   },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
+    categories() {
+      return this.$store.getters["categories/getCategories"];
+    },
   },
+
   methods: {
     editItem(item) {
-      this.item = item;
-      this.action = "edit";
       this.dialog = true;
+      this.actionType = "edit";
+      this.item = { ...item };
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
+      this.item = { ...item };
     },
-
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-      } else {
-        this.desserts.push(this.editedItem);
-      }
-      this.close();
-    },
+    deleteItemConfirm() {},
+    closeDelete() {},
   },
 };
 </script>

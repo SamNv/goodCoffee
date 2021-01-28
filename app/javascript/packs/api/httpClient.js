@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = process.env.NODE_ENV === "production" ? "/" : "http://localhost:3000" 
+const API_URL = process.env.NODE_ENV === "production" ? "/" : "http://localhost:3000"
 
 const securedAxiosInstance = axios.create({
   baseURL: API_URL,
@@ -14,7 +14,8 @@ const plainAxiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'X-CSRF-TOKEN': localStorage.csrf
   }
 })
 

@@ -75,12 +75,14 @@
 import Products from "../components/admin/Products";
 import Orders from "../components/admin/Orders";
 import Users from "../components/admin/Users";
+import Categories from "../components/admin/Categories";
 
 export default {
   components: {
     Products,
     Orders,
     Users,
+    Categories,
   },
   mounted() {
     if (this.$route.query.q) {
@@ -98,6 +100,7 @@ export default {
         component: "Orders",
       },
       { title: "Users", icon: "mdi-account", component: "Users" },
+      { title: "Categories", icon: "mdi-shape", component: "Categories" },
     ],
   }),
 };

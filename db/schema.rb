@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_20_062911) do
+ActiveRecord::Schema.define(version: 2021_01_28_064751) do
+
+  create_table "categories", charset: "utf8mb4", collation: "utf8mb4_bin", force: :cascade do |t|
+    t.string "name"
+    t.integer "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_bin", force: :cascade do |t|
     t.string "email"
