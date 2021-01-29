@@ -1,44 +1,63 @@
 import { securedAxiosInstance, plainAxiosInstance } from '../../api/httpClient.js'
 import { flatPayload } from "../../utils/store"
 const state = {
-    categories: [
-    ]
+  categories: [],
+  category: {}
 }
 
 const getters = {
-    getCategories(state) {
-        return state.categories
-    }
+  getCategories(state) {
+    return state.categories.filter(c => c.status == 'active')
+  },
+  getCategory(state) {
+    return state.category
+  }
 }
 
 const mutations = {
-    getCategories(state, payload) {
-        state.categories = flatPayload(payload)
-    },
-    create(state, payload) {
-        state.categories.push(flatPayload(payload))
-    }
+  getCategories(state, payload) {
+    state.categories = flatPayload(payload).reverse()
+  },
+  create(state, payload) {
+    state.categories.unshift(flatPayload(payload))
+  },
+  update(state, payload) {
+    const updateCategory = flatPayload(payload)
+    state.categories = state.categories.map(c => {
+      if (c.id === updateCategory.id) {
+        return updateCategory;
+      }
+      return c;
+    })
+  },
+  setCategory(state, data) {
+    state.category = data
+  }
 }
 
 const actions = {
-    async getCategories({ commit }) {
-        const res = await plainAxiosInstance.get("/api/categories")
-        commit("getCategories", res)
-    },
-    async update({ commit }, { id, category }) {
-        const res = await plainAxiosInstance.put(`/api/categories/${id}`, category)
-    },
-    async create({ commit }, data) {
-        const res = await plainAxiosInstance.post('/api/categories', { category: data })
-        commit("create", res)
-    }
+  async getCategories({ commit }) {
+    const res = await plainAxiosInstance.get("/api/categories")
+    commit("getCategories", res)
+  },
+  async update({ commit }, { id, category }) {
+    const res = await plainAxiosInstance.put(`/api/categories/${id}`, { category: category })
+    commit("update", res)
+  },
+  async create({ commit }, category) {
+    const res = await plainAxiosInstance.post('/api/categories', { category: category })
+    commit("create", res)
+  },
+  setCategory({ commit }, data) {
+    commit('setCategory', data)
+  }
 }
 
 
 export default {
-    namespaced: true,
-    state,
-    getters,
-    mutations,
-    actions
+  namespaced: true,
+  state,
+  getters,
+  mutations,
+  actions
 };

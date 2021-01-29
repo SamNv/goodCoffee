@@ -17,6 +17,5 @@ User.create!(
 (1..15).each do |i|
   Category.create!(
     name: Faker::Coffee.variety,
-    status: 0,
   )
 end

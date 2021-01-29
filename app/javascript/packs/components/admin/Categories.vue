@@ -20,24 +20,30 @@
                 class="mb-2"
                 v-bind="attrs"
                 v-on="on"
-                @click="item = {}"
+                @click="createItem"
               >
                 New Category
               </v-btn>
             </template>
-            <CategoryForm :actionType="actionType" :item="item" />
+            <CategoryForm :actionType="actionType" />
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card>
-              <v-card-title class="headline"
-                >Are you sure you want to delete this item?</v-card-title
-              >
+            <v-card class="pa-6">
+              <p class="mb-2">Are you sure you want to delete this item?</p>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
+                <v-btn
+                  color="blue darken-1"
+                  rounded
+                  text
+                  @click="dialogDelete = false"
                   >Cancel</v-btn
                 >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn
+                  color="blue darken-1"
+                  rounded
+                  text
+                  @click="deleteItemConfirm"
                   >OK</v-btn
                 >
                 <v-spacer></v-spacer>
@@ -68,8 +74,6 @@ export default {
     dialog: false,
     dialogDelete: false,
     actionType: "new",
-    item: {},
-
     search: "",
     headers: [
       {
@@ -83,15 +87,11 @@ export default {
       { text: "Actions", value: "actions", sortable: false },
     ],
     defaultItem: {
-      name: "",
+      name: null,
     },
   }),
   mounted() {
     this.$store.dispatch("categories/getCategories");
-    this.$store.dispatch("categories/update", {
-      id: 1,
-      category: { name: "change 2" },
-    });
   },
   computed: {
     formTitle() {
@@ -100,20 +100,48 @@ export default {
     categories() {
       return this.$store.getters["categories/getCategories"];
     },
+    category() {
+      return { ...this.$store.getters["categories/getCategory"] };
+    },
   },
 
   methods: {
     editItem(item) {
-      this.dialog = true;
+      this.$store.dispatch("categories/setCategory", item);
       this.actionType = "edit";
-      this.item = { ...item };
+      this.dialog = true;
+    },
+    createItem() {
+      this.$store.dispatch("categories/setCategory", this.defaultItem);
+      this.actionType = "new";
+      this.dialog = true;
     },
 
     deleteItem(item) {
       this.dialogDelete = true;
-      this.item = { ...item };
+      this.$store.dispatch("categories/setCategory", item);
     },
-    deleteItemConfirm() {},
+    async deleteItemConfirm() {
+      try {
+        const data = {
+          id: this.category.id,
+          category: {
+            name: this.category.name,
+            status: 0,
+          },
+        };
+        await this.$store.dispatch("categories/update", data);
+        this.$store.dispatch("toast/show", {
+          message: this.category.name + " was deleted successfully!",
+        });
+        this.dialogDelete = false;
+      } catch (e) {
+        this.$store.dispatch("toast/showError", {
+          message: "Failed to delete",
+        });
+        throw e;
+      }
+    },
     closeDelete() {},
   },
 };
