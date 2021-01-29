@@ -9,7 +9,14 @@
 User.create!(
   first_name: Faker::Name.first_name,
   last_name: Faker::Name.last_name,
-  email: "admin@example.com",
+  email: "admin@123.com",
   password: "asdfasdf",
   password_confirmation: "asdfasdf",
 )
+
+(1..15).each do |i|
+  Category.create!(
+    name: Faker::Coffee.variety,
+    status: 0,
+  )
+end

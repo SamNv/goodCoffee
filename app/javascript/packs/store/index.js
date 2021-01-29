@@ -10,7 +10,11 @@ const modules = {};
 const moduleNames = [
   "home",
   "toast",
-  "auth"
+  "auth",
+  "products",
+  "orders",
+  "users",
+  "categories"
 ];
 
 moduleNames.forEach(name => {

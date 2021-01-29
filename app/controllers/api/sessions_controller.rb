@@ -1,7 +1,7 @@
 class Api::SessionsController < ApplicationController
   before_action :authorize_access_request!, only: [:destroy]
   protect_from_forgery except: [:create, :destroy]
-  
+
   def create
     user = User.find_by!(email: params[:email])
     if user.authenticate(params[:password])
@@ -12,7 +12,7 @@ class Api::SessionsController < ApplicationController
                           value: tokens[:access],
                           httponly: true,
                           secure: Rails.env.production?)
-      render json: { csrf: tokens[:csrf] }
+      render json: { csrf: tokens[:csrf], token: tokens[:access] }
     else
       not_authorized
     end

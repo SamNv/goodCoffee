@@ -1,13 +1,13 @@
 <template>
   <v-app id="app">
-    <Header />
+    <component :is="this.$route.name == 'AdminPage' ? 'AdminHeader': 'Header'"></component>
     <v-main class="mt-12">
       <router-view />
     </v-main>
     <transition name="slide-fade" appear>
       <GlobalToast :key="toastIndex" />
     </transition>
-    <Audio />
+    <Audio v-if="this.$route.name == 'HomePage'" />
     <v-footer class="footer">
       <!-- TODO 音楽の操作を実施する -->
       <!-- <v-btn @click="toggleAudio()" class="primary">Play</v-btn> -->
@@ -25,6 +25,7 @@
 import GlobalToast from "./packs/components/GlobalToast";
 import i18n from "./packs/plugins/i18n";
 import Header from "./packs/components/shared/Header";
+import AdminHeader from "./packs/components/shared/AdminHeader";
 import Audio from "./packs/components/home/Audio";
 
 export default {
@@ -40,11 +41,15 @@ export default {
   computed: {
     toastIndex() {
       return this.$store.getters["toast/index"];
-    }
+    },
+    // isNotAdminPage(){
+    //   return this.$route.name != 'AdminPage'
+    // }
   },
   components: {
     GlobalToast,
     Header,
+    AdminHeader,
     Audio,
   },
   methods: {
