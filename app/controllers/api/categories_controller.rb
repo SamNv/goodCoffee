@@ -3,7 +3,7 @@ class Api::CategoriesController < ApplicationController
   protect_from_forgery except: [:create, :update]
 
   def index
-    render json: { data: Category.all }, status: :ok
+    render json: { data: Category.where(status: 1) }, status: :ok
   end
 
   def create
@@ -30,6 +30,6 @@ class Api::CategoriesController < ApplicationController
   private
 
   def category_param
-    params.require(:category).permit(:name)
+    params.require(:category).permit(:name, :status)
   end
 end

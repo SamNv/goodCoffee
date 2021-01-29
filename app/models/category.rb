@@ -1,12 +1,12 @@
 class Category < ApplicationRecord
   before_save :default_values
-  enum status: { active: 0, inactive: 1 }
+  enum status: { inactive: 0, active: 1 }
 
   validates :name, length: { minimum: 1, maximum: 40 }, presence: true
 
   private
 
   def default_values
-    self.status ||= 0
+    self.status ||= 1
   end
 end
