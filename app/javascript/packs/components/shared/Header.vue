@@ -47,7 +47,7 @@
         top
         offset-y="15"
         color="orange darken-1"
-        content="6"
+        :content="itemsInCart"
         class="mr-5 ml-4 clickable"
       >
         <v-icon
@@ -142,6 +142,10 @@ export default {
   computed: {
     logined() {
       return this.$store.getters["auth/logined"];
+    },
+    itemsInCart() {
+      let count = this.$store.getters["cart/getItems"].length;
+      return count == 0 ? "0" : count;
     },
   },
   data: () => ({

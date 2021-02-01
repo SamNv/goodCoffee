@@ -6,8 +6,8 @@ class Api::CategoriesController < ApplicationController
     render json: { data: Category.where(status: 1) }, status: :ok
   end
 
-  def show 
-    render json: { data: Category.find_by(id: params[:id]) }, include: :products, status: :ok
+  def show
+    render json: { data: Category.find_by(id: params[:id]) }, include: { products: { methods: :image_url } }, status: :ok
   end
 
   def create

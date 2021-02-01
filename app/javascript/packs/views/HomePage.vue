@@ -44,41 +44,7 @@ export default {
   },
   data: () => ({
     tab: 1,
-    componentIndex: 1,
-    coffeeList: [
-      {
-        name: "Sweet Cold ",
-        price: 10,
-      },
-      {
-        name: "Sweet Brew2",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew3",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew4",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew5",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew6",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew7",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew8",
-        price: 10,
-      },
-    ],
+    componentIndex: 1
   }),
   components: {
     Products,

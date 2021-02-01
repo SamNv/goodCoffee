@@ -23,96 +23,26 @@
         <v-stepper-content step="1">
           <div class="order_cart--content over-scroll mb-6 scrollbar--hidden">
             <v-list three-line>
-              <template>
-                <v-list-item>
-                  <v-list-item-avatar>
-                    <v-img
-                      src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
-                    ></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title v-html="'test'"></v-list-item-title>
-                    <v-list-item-subtitle
-                      v-html="'subtitle'"
-                    ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-              <template>
-                <v-list-item>
-                  <v-list-item-avatar>
-                    <v-img
-                      src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
-                    ></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title v-html="'test'"></v-list-item-title>
-                    <v-list-item-subtitle
-                      v-html="'subtitle'"
-                    ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-              <template>
-                <v-list-item>
-                  <v-list-item-avatar>
-                    <v-img
-                      src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
-                    ></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title v-html="'test'"></v-list-item-title>
-                    <v-list-item-subtitle
-                      v-html="'subtitle'"
-                    ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-              <template>
-                <v-list-item>
-                  <v-list-item-avatar>
-                    <v-img
-                      src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
-                    ></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title v-html="'test'"></v-list-item-title>
-                    <v-list-item-subtitle
-                      v-html="'subtitle'"
-                    ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-              <template>
-                <v-list-item>
-                  <v-list-item-avatar>
-                    <v-img
-                      src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
-                    ></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title v-html="'test'"></v-list-item-title>
-                    <v-list-item-subtitle
-                      v-html="'subtitle'"
-                    ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-              <template>
-                <v-list-item>
-                  <v-list-item-avatar>
-                    <v-img
-                      src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
-                    ></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-title v-html="'test'"></v-list-item-title>
-                    <v-list-item-subtitle
-                      v-html="'subtitle'"
-                    ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
+              <v-list-item v-for="(item, index) in itemsInCart" :key="index">
+                <v-list-item-avatar>
+                  <v-img
+                    src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
+                  ></v-img>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title v-html="item.name"></v-list-item-title>
+                  <v-list-item-subtitle>
+                    <v-text-field>
+                      <v-text-field
+                        v-model="item.count"
+                        type="number"
+                        :rules="[minNumber(1), maxNumber(100)]"
+                        clearable
+                      ></v-text-field>
+                    </v-text-field>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
           </div>
 
@@ -127,7 +57,7 @@
 
         <v-stepper-content step="2">
           <div class="order_cart--content">
-            <Checkout/>
+            <Checkout />
           </div>
           <v-btn color="primary" @click="orderStep = 3">
             Continue
@@ -149,13 +79,23 @@
 </template>
 
 <script>
+import { minNumber, maxNumber } from "../../constants/rules";
 import Checkout from "./CheckOut";
 export default {
+  created: function() {
+    this.minNumber = minNumber;
+    this.maxNumber = maxNumber;
+  },
   data: () => ({
-    orderStep: 1
+    orderStep: 1,
   }),
   components: {
     Checkout,
+  },
+  computed: {
+    itemsInCart() {
+      return this.$store.getters["cart/getItems"];
+    },
   },
 };
 </script>

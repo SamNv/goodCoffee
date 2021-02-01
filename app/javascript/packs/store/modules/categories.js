@@ -13,7 +13,7 @@ const getters = {
   getCategory(state) {
     return state.category
   },
-  getCategoryInfo(state){
+  getCategoryInfo(state) {
     return state.categoryInfo
   }
 }
@@ -39,6 +39,7 @@ const mutations = {
   },
   setCategoryInfo(state, payload) {
     state.categoryInfo = flatPayload(payload)
+    state.categoryInfo["products"] = state.categoryInfo["products"].filter(p => p.status === 'active')
   }
 }
 

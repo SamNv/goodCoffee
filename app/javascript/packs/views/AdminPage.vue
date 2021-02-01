@@ -1,6 +1,13 @@
 <template>
   <div>
-    <v-sheet height="calc(100% - 84px)">
+    <v-row v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        class="mb-5 progress-circular"
+      ></v-progress-circular>
+    </v-row>
+    <v-sheet height="calc(100% - 84px)" v-if="!loading">
       <v-container fluid class="">
         <v-row>
           <v-app-bar-nav-icon
@@ -84,14 +91,18 @@ export default {
     Users,
     Categories,
   },
-  mounted() {
+  async mounted() {
     if (this.$route.query.q) {
       this.component = this.$route.query.q;
     }
+    await this.$store.dispatch("categories/getCategories");
+    await this.$store.dispatch("products/getProducts");
+    this.loading = false;
   },
   data: () => ({
     drawer: null,
     component: "Products",
+    loading: true,
     items: [
       { title: "Products", icon: "mdi-view-dashboard", component: "Products" },
       {
@@ -110,5 +121,11 @@ export default {
 .nav {
   top: 48px !important;
   height: calc(100% - 84px) !important;
+}
+
+.progress-circular {
+  top: 50%;
+  left: 50%;
+  position: absolute;
 }
 </style>

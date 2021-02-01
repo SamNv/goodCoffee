@@ -3,13 +3,13 @@ class Api::ProductsController < ApplicationController
   protect_from_forgery except: [:create, :update]
 
   def index
-    render json: { data: Product.where(status: 1) }, include: :category, status: :ok
+    render json: { data: Product.where(status: 1) }, include: :category, methods: [:image_url], status: :ok
   end
 
   def create
     product = Product.new(product_param)
     if product.save
-      render json: { data: product }, include: :category, status: :ok
+      render json: { data: product }, include: :category, methods: [:image_url], status: :ok
     else
       render json: { data: product.errors }, status: :unprocessable_entity
     end
@@ -18,7 +18,7 @@ class Api::ProductsController < ApplicationController
   def update
     product = Product.find_by(id: params[:id])
     if product.update(product_param)
-      render json: { data: product }, include: :category, status: :ok
+      render json: { data: product }, include: :category, methods: [:image_url], status: :ok
     else
       render json: { data: product.errors }, status: :unprocessable_entity
     end
@@ -30,6 +30,6 @@ class Api::ProductsController < ApplicationController
   private
 
   def product_param
-    params.require(:product).permit(:name, :price, :discount, :status, :image, :category_id)
+    params.permit(:name, :price, :discount, :status, :image, :category_id)
   end
 end

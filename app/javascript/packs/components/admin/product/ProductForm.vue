@@ -85,7 +85,11 @@ export default {
       return this.$store.getters["categories/getCategories"];
     },
     product() {
-      return { ...this.$store.getters["products/getProduct"] };
+      let product = { ...this.$store.getters["products/getProduct"] };
+      this.imageUrl = product.image_url
+        ? product.image_url
+        : "https://dummyimage.com/600x400/000/fff";
+      return product;
     },
   },
   props: {
@@ -95,8 +99,7 @@ export default {
   data: () => ({
     formValid: false,
     imageFile: null,
-    imageUrl:
-      "https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg",
+    imageUrl: "",
   }),
   methods: {
     close() {
@@ -112,15 +115,16 @@ export default {
     async submit() {
       if (this.$refs.form.validate()) {
         try {
-          const params = {
-            name: this.product.name,
-            price: this.product.price,
-            discount: this.product.discount,
-            category_id: this.product.category_id,
-            image: this.imageFile,
-          };
+          let formData = new FormData();
+          formData.append("name", this.product.name);
+          formData.append("price", this.product.price);
+          formData.append("discount", this.product.discount);
+          formData.append("category_id", this.product.category_id);
+          if (this.imageFile !== null) {
+            formData.append("image", this.imageFile);
+          }
           if (this.action == "new") {
-            await this.$store.dispatch("products/create", params);
+            await this.$store.dispatch("products/create", formData);
             this.$store.dispatch("toast/show", {
               message: this.product.name + " was created successfully!",
             });
@@ -129,7 +133,7 @@ export default {
           if (this.action == "edit") {
             await this.$store.dispatch("products/update", {
               id: this.product.id,
-              params: params,
+              params: formData,
             });
             this.$store.dispatch("toast/show", {
               message: this.product.name + " was updated successfully!",
