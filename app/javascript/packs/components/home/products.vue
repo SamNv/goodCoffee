@@ -6,8 +6,8 @@
       sm="6"
       md="4"
       xsm="12"
-      v-for="item in products"
-      :key="item.name"
+      v-for="(item, index) in products"
+      :key="index"
     >
       <v-badge
         class="mr-3"
@@ -15,7 +15,7 @@
         left
         color="orange"
         offset-x="10"
-        content="30%"
+        :content="item.discount + '%'"
       >
         <v-avatar size="50">
           <v-img
@@ -29,7 +29,12 @@
           <span class="mr-auto clickable">{{ item.name }}</span>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on" @click="addToCart(item.name)">
+              <v-btn
+                icon
+                v-bind="attrs"
+                v-on="on"
+                @click="addToCart(item.name)"
+              >
                 <v-icon color="amber accent-32">
                   mdi-cart-plus
                 </v-icon>
@@ -42,10 +47,10 @@
           <span
             class="orange--text text--lighten-3 font-weight-medium subtitle-1"
           >
-            {{ (item.price * 70) / 100 }},000 $
+            {{ (item.price * (100 - item.discount)) / 100 }} $
           </span>
           <span class="text-decoration-line-through subtitle-2 grey--text ml-1"
-            >{{ item.price }},000 $</span
+            >{{ item.price }} $</span
           >
         </p>
       </div>

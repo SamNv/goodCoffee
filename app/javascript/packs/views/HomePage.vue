@@ -5,58 +5,17 @@
       <ul class="px-0 mb-15">
         <li
           class="menu-item clickable"
-          :class="tab == 1 ? 'orange--text' : ''"
-          @click="
-            tab = 1;
-            index += 1;
-          "
+          :class="tab == index + 1 ? 'orange--text' : ''"
+          v-for="(item, index) in categories"
+          :key="index"
+          @click="getProducts(item.id, index)"
         >
-          coffee
-        </li>
-        <li
-          class="menu-item clickable"
-          :class="tab == 2 ? 'orange--text' : ''"
-          @click="
-            tab = 2;
-            index += 1;
-          "
-        >
-          espresso
-        </li>
-        <li
-          class="menu-item clickable"
-          :class="tab == 3 ? 'orange--text' : ''"
-          @click="
-            tab = 3;
-            index += 1;
-          "
-        >
-          non-coffee
-        </li>
-        <li
-          class="menu-item clickable"
-          :class="tab == 4 ? 'orange--text' : ''"
-          @click="
-            tab = 4;
-            index += 1;
-          "
-        >
-          frappes
-        </li>
-        <li
-          class="menu-item clickable"
-          :class="tab == 5 ? 'orange--text' : ''"
-          @click="
-            tab = 5;
-            index += 1;
-          "
-        >
-          floats and smoothies
+          {{ item.name }}
         </li>
       </ul>
       <div class="content">
         <transition name="list" appear>
-          <Products :products="coffeeList" :key="index" />
+          <Products :products="category.products" :key="componentIndex" />
         </transition>
       </div>
     </div>
@@ -65,9 +24,27 @@
 <script>
 import Products from "../components/home/products";
 export default {
+  async mounted() {
+    await this.$store.dispatch("categories/getCategories");
+    await this.$store.dispatch(
+      "categories/getCategoryById",
+      this.$store.getters["categories/getCategories"][0].id
+    );
+  },
+  created() {
+    console.log(this.categories[0]);
+  },
+  computed: {
+    categories() {
+      return [...this.$store.getters["categories/getCategories"]];
+    },
+    category() {
+      return { ...this.$store.getters["categories/getCategoryInfo"] };
+    },
+  },
   data: () => ({
     tab: 1,
-    index: 1,
+    componentIndex: 1,
     coffeeList: [
       {
         name: "Sweet Cold ",
@@ -105,6 +82,13 @@ export default {
   }),
   components: {
     Products,
+  },
+  methods: {
+    getProducts(categoryId, index) {
+      this.tab = index + 1;
+      this.componentIndex += 1;
+      this.$store.dispatch("categories/getCategoryById", categoryId);
+    },
   },
 };
 </script>

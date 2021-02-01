@@ -20,30 +20,30 @@
                 class="mb-2"
                 v-bind="attrs"
                 v-on="on"
-                @click="item = {}"
+                @click="createItem"
               >
                 New Product
               </v-btn>
             </template>
             <ProductForm
-              :formTitle="formTitle"
               :dialog="dialog"
               @close="dialog = $event"
-              :item="item"
               :action="action"
             />
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card>
-              <v-card-title class="headline"
-                >Are you sure you want to delete this item?</v-card-title
-              >
+            <v-card class="pa-6">
+              <p class="mb-2">Are you sure you want to delete this item?</p>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
+                <v-btn color="blue darken-1" text @click="closeDelete" rounded
                   >Cancel</v-btn
                 >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="deleteItemConfirm"
+                  rounded
                   >OK</v-btn
                 >
                 <v-spacer></v-spacer>
@@ -78,6 +78,10 @@
 <script>
 import ProductForm from "./product/ProductForm";
 export default {
+  mounted() {
+    this.$store.dispatch("categories/getCategories");
+    this.$store.dispatch("products/getProducts");
+  },
   components: {
     ProductForm,
   },
@@ -85,7 +89,6 @@ export default {
     dialog: false,
     dialogDelete: false,
     search: "",
-    item: {},
     action: "new",
     headers: [
       {
@@ -95,69 +98,65 @@ export default {
         filterable: true,
         value: "name",
       },
+      { text: "Category", value: "category" },
       { text: "Price ($)", value: "price" },
-      { text: "Discount", value: "discount" },
+      { text: "Discount (%)", value: "discount" },
       { text: "Actions", value: "actions", sortable: false },
     ],
     editedIndex: -1,
 
-    defaultItem: {
-      name: "",
-      image: 0,
-      discount: 0,
-      price: 0,
-    },
-    products: [],
+    defaultItem: {},
   }),
-  mounted() {
-    this.products = this.$store.getters["products/getProducts"];
-  },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
+    products() {
+      return [...this.$store.getters["products/getProducts"]];
+    },
+    product() {
+      return { ...this.$store.getters["products/getProduct"] };
+    },
   },
   methods: {
     editItem(item) {
-      this.item = item;
+      this.$store.dispatch("products/setProduct", item);
       this.action = "edit";
+      this.dialog = true;
+    },
+    createItem() {
+      this.$store.dispatch("products/setProduct", this.defaultItem);
+      this.action = "new";
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
+      this.$store.dispatch("products/setProduct", item);
     },
 
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
+    async deleteItemConfirm() {
+      try {
+        const params = {
+          status: 0,
+        };
+        await this.$store.dispatch("products/update", {
+          id: this.product.id,
+          params: params,
+        });
+        this.$store.dispatch("toast/show", {
+          message: this.product.name + " was deleted successfully!",
+        });
+        this.dialogDelete = false;
+      } catch (e) {
+        this.$store.dispatch("toast/showError", {
+          message: "Failed to delete",
+        });
+        throw e;
+      }
     },
-
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     closeDelete() {
       this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-      } else {
-        this.desserts.push(this.editedItem);
-      }
-      this.close();
     },
   },
 };

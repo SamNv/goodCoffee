@@ -6,10 +6,10 @@ Rails.application.routes.draw do
     post "signin", controller: :sessions, action: :create
     delete "signin", controller: :sessions, action: :destroy
     post "refresh", controller: :refresh, action: :create
-    get "index", controller: :users, action: :index
+    get "users", controller: :users, action: :index
 
-    resources :categories, only: [:index , :create, :update, :destroy]
-
+    resources :categories, only: [:index, :show, :create, :update, :destroy]
+    resources :products, only: [:index, :create, :update, :destroy]
   end
 
   get "*path", to: "home#index"

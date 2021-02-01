@@ -6,6 +6,10 @@ class Api::CategoriesController < ApplicationController
     render json: { data: Category.where(status: 1) }, status: :ok
   end
 
+  def show 
+    render json: { data: Category.find_by(id: params[:id]) }, include: :products, status: :ok
+  end
+
   def create
     category = Category.new(category_param)
     if category.save

@@ -2,11 +2,11 @@
   <v-card class="pa-10 product-form">
     <v-form ref="form" v-model="formValid" lazy-validation>
       <v-select
-        v-model="item.catetory"
+        v-model="product.category_id"
         :items="categories"
-        item-value="name"
+        item-value="id"
         item-text="name"
-        :rules="[(v) => !!v || 'Item is required']"
+        :rules="[requireRules()]"
         label="Category"
         required
       >
@@ -16,10 +16,10 @@
           <v-img class="product-image" v-if="imageUrl" :src="imageUrl"></v-img>
         </v-avatar>
         <v-text-field
-          v-model="item.name"
+          v-model="product.name"
           :counter="40"
           label="Name"
-          required
+          :rules="[requireRules(), maxRules(40)]"
           clearable
         ></v-text-field>
         <input
@@ -32,17 +32,17 @@
       </div>
 
       <v-text-field
-        v-model="item.price"
+        v-model="product.price"
         label="Price ($)"
         type="number"
-        required
+        :rules="[requireRules(), minNumber(0), maxNumber(100)]"
         clearable
       ></v-text-field>
       <v-text-field
-        v-model="item.discount"
+        v-model="product.discount"
         label="Discount"
         type="number"
-        required
+        :rules="[minNumber(0), maxNumber(100)]"
         clearable
       ></v-text-field>
     </v-form>
@@ -52,7 +52,13 @@
       <v-btn color="blue darken-1" @click="close" rounded text>
         Cancel
       </v-btn>
-      <v-btn :disabled="!formValid" rounded color="blue darken-1" text>
+      <v-btn
+        :disabled="!formValid"
+        rounded
+        color="blue darken-1"
+        text
+        @click="submit"
+      >
         Save
       </v-btn>
     </v-card-actions>
@@ -60,20 +66,35 @@
 </template>
 
 <script>
+import {
+  requireRules,
+  maxRules,
+  minNumber,
+  maxNumber,
+} from "../../../constants/rules";
+
 export default {
+  created: function() {
+    this.requireRules = requireRules;
+    this.maxRules = maxRules;
+    this.minNumber = minNumber;
+    this.maxNumber = maxNumber;
+  },
   computed: {
     categories() {
       return this.$store.getters["categories/getCategories"];
     },
+    product() {
+      return { ...this.$store.getters["products/getProduct"] };
+    },
   },
   props: {
-    formTitle: String,
     dialog: Boolean,
     action: String,
-    item: Object,
   },
   data: () => ({
     formValid: false,
+    imageFile: null,
     imageUrl:
       "https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg",
   }),
@@ -85,9 +106,49 @@ export default {
       this.$refs.productImageFile.click();
     },
     onFileChange(e) {
-      console.log(e)
-      const file = e.target.files[0];
-      this.imageUrl = URL.createObjectURL(file);
+      this.imageFile = e.target.files[0];
+      this.imageUrl = URL.createObjectURL(this.imageFile);
+    },
+    async submit() {
+      if (this.$refs.form.validate()) {
+        try {
+          const params = {
+            name: this.product.name,
+            price: this.product.price,
+            discount: this.product.discount,
+            category_id: this.product.category_id,
+            image: this.imageFile,
+          };
+          if (this.action == "new") {
+            await this.$store.dispatch("products/create", params);
+            this.$store.dispatch("toast/show", {
+              message: this.product.name + " was created successfully!",
+            });
+            this.$refs.form.reset();
+          }
+          if (this.action == "edit") {
+            await this.$store.dispatch("products/update", {
+              id: this.product.id,
+              params: params,
+            });
+            this.$store.dispatch("toast/show", {
+              message: this.product.name + " was updated successfully!",
+            });
+          }
+        } catch (e) {
+          if (this.action == "new") {
+            this.$store.dispatch("toast/showError", {
+              message: "Failed to create",
+            });
+          }
+          if (this.action == "edit") {
+            this.$store.dispatch("toast/showError", {
+              message: "Failed to edit",
+            });
+          }
+          throw e;
+        }
+      }
     },
   },
 };

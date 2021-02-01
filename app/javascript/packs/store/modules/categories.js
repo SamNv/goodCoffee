@@ -2,7 +2,8 @@ import { securedAxiosInstance, plainAxiosInstance } from '../../api/httpClient.j
 import { flatPayload } from "../../utils/store"
 const state = {
   categories: [],
-  category: {}
+  category: {},
+  categoryInfo: {}
 }
 
 const getters = {
@@ -11,6 +12,9 @@ const getters = {
   },
   getCategory(state) {
     return state.category
+  },
+  getCategoryInfo(state){
+    return state.categoryInfo
   }
 }
 
@@ -32,6 +36,9 @@ const mutations = {
   },
   setCategory(state, data) {
     state.category = data
+  },
+  setCategoryInfo(state, payload) {
+    state.categoryInfo = flatPayload(payload)
   }
 }
 
@@ -39,6 +46,10 @@ const actions = {
   async getCategories({ commit }) {
     const res = await plainAxiosInstance.get("/api/categories")
     commit("getCategories", res)
+  },
+  async getCategoryById({ commit }, id) {
+    const res = await plainAxiosInstance.get(`/api/categories/${id}`)
+    commit('setCategoryInfo', res)
   },
   async update({ commit }, { id, category }) {
     const res = await plainAxiosInstance.put(`/api/categories/${id}`, { category: category })
