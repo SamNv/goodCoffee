@@ -11,14 +11,11 @@
     </v-card-title>
     <v-data-table :headers="headers" :items="users" :search="search">
       <template v-slot:item.actions="{ item }">
-        <v-icon small class="mr-2 blue--text" @click="editItem(item)">
+        <v-icon small class="mr-2 blue--text">
           mdi-eye
         </v-icon>
-        <v-icon small class="mr-2 orange--text" @click="editItem(item)">
+        <v-icon small class="mr-2 orange--text">
           mdi-pencil
-        </v-icon>
-        <v-icon small @click="deleteItem(item)" class="red--text">
-          mdi-close
         </v-icon>
       </template>
     </v-data-table>
@@ -71,14 +68,16 @@ export default {
       address: "",
       count: 0,
     },
-    users: []
   }),
-  mounted(){
-      this.users = this.$store.getters["users/getUsers"]
+  mounted() {
+    this.$store.dispatch("users/getUsers");
   },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
+    },
+    users() {
+      return [...this.$store.getters["users/getUsers"]];
     },
   },
 

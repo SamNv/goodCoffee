@@ -1,90 +1,39 @@
+import { securedAxiosInstance, plainAxiosInstance } from '../../api/httpClient.js'
+import { flatPayload } from "../../utils/store"
+
 const state = {
   users: [
-    {
-      name: "Frozen Yogurt",
-      email: "Frozen Yogurt@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "Ice cream sandwich",
-      email: "Ice cream sandwich@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "Eclair",
-      email: "Eclair@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "Cupcake",
-      email: "Cupcake@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "Gingerbread",
-      email: "Gingerbread@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "Jelly bean",
-      email: "Jelly bean@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "Lollipop",
-      email: "Lollipop@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "Honeycomb",
-      email: "Honeycomb@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "Donut",
-      email: "Donut@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
-    {
-      name: "KitKat",
-      email: "KitKat@gmail.com",
-      phone: "01223456545",
-      address: "Ha Dong - Ha Noi",
-      count: 12,
-    },
+
   ]
 }
 
 const getters = {
   getUsers(state) {
-    return state.users
+    return state.users.map(u => {
+      return {
+        id: u.id,
+        name: u.first_name + " " + u.last_name,
+        email: u.email,
+        phone: u.phone,
+        address: u.address
+      }
+    })
   }
 }
 
 
 const mutations = {
+  getUsers(state, data) {
+    state.users = flatPayload(data)
+  }
 
 }
 
 const actions = {
+  async getUsers({ commit }) {
+    const res = await plainAxiosInstance.get("/api/users")
+    commit("getUsers", res)
+  }
 
 }
 

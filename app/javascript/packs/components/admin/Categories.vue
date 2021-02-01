@@ -141,8 +141,7 @@ export default {
         });
         throw e;
       }
-    },
-    closeDelete() {},
+    }
   },
 };
 </script>

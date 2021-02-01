@@ -26,8 +26,11 @@ gem 'jwt_sessions'
 gem 'faker'
 gem 'rack-cors'
 # Use Active Storage variant
-# gem 'image_processing', '~> 1.2'
-
+gem 'image_processing', '~> 1.2'
+gem 'cloudinary', require: true        # Cloudinary
+gem 'activestorage-cloudinary-service' # Cloudinary と Active Storage の連携をする
+gem 'active_storage_validations'       # 画像ファイルのバリデーション用
+gem 'mini_magick', '>= 4.9.5'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.4', require: false
 
