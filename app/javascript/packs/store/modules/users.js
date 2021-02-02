@@ -1,10 +1,8 @@
-import { securedAxiosInstance, plainAxiosInstance } from '../../api/httpClient.js'
+import { securedAxiosInstance } from '../../api/httpClient.js'
 import { flatPayload } from "../../utils/store"
 
 const state = {
-  users: [
-
-  ]
+  users: []
 }
 
 const getters = {
@@ -15,7 +13,8 @@ const getters = {
         name: u.first_name + " " + u.last_name,
         email: u.email,
         phone: u.phone,
-        address: u.address
+        address: u.address,
+        orders: u.orders
       }
     })
   }
@@ -31,10 +30,9 @@ const mutations = {
 
 const actions = {
   async getUsers({ commit }) {
-    const res = await plainAxiosInstance.get("/api/users")
+    const res = await securedAxiosInstance.get("/api/users")
     commit("getUsers", res)
   }
-
 }
 
 

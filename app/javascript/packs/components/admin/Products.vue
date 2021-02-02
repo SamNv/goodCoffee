@@ -29,6 +29,7 @@
               :dialog="dialog"
               @close="dialog = $event"
               :action="action"
+              :key="productFormIndex"
             />
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
@@ -86,6 +87,7 @@ export default {
     ProductForm,
   },
   data: () => ({
+    productFormIndex: 0,
     dialog: false,
     dialogDelete: false,
     search: "",
@@ -120,11 +122,13 @@ export default {
   },
   methods: {
     editItem(item) {
+      this.productFormIndex += 1;
       this.$store.dispatch("products/setProduct", item);
       this.action = "edit";
       this.dialog = true;
     },
     createItem() {
+      this.productFormIndex += 1;
       this.$store.dispatch("products/setProduct", this.defaultItem);
       this.action = "new";
       this.dialog = true;

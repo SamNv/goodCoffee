@@ -1,14 +1,31 @@
 class Api::UsersController < ApplicationController
+  before_action :authorize_access_request!, only: [:me, :index, :show]
   protect_from_forgery except: [:create]
-  def index 
-    render json: {data: User.all}
-  end 
-  
+
+  def me
+    render json: current_user.as_json(only: [:id, :first_name, :last_name, :phone, :address, :email, :role], include: { orders: { include: { order_details: {
+                                        include: { product: { only: [:id, :name], methods: :image_url } },
+                                        only: [:id, :price, :quantity, :discount],
+                                      } } } })
+  end
+
+  def index
+    render json: { data: User.all }, include: :orders, status: :ok
+  end
+
+  def show
+    user = User.find_by(id: params[:id])
+    render json: { data: user }, include: { orders: { include: { order_details: {
+      include: { product: { only: [:id, :name], methods: :image_url } },
+      only: [:id, :price, :quantity, :discount],
+    } } } }, status: :ok
+  end
+
   def create
     user = User.new(user_params)
     if user.save
       # payloadは，トークン自体に内包させられるユーザー情報。ここではuser_idを内包させている。
-      payload = { user_id: user.id }
+      payload = { user_id: user.id, aud: [user.role] }
       session = JWTSessions::Session.new(payload: payload, refresh_by_access_allowed: true)
       tokens = session.login
 
@@ -24,9 +41,28 @@ class Api::UsersController < ApplicationController
     end
   end
 
+  def token_claims
+    {
+      aud: allowed_aud,
+      verify_aud: true,
+    }
+  end
+
   private
+
+  def allowed_aud
+    if action_name == 'index'
+      return 'admin'
+    end
+  end
 
   def user_params
     params.permit(:first_name, :last_name, :email, :password, :password_confirmation)
+  end
+
+  def check_admin
+    if current_user && current_user.role == "user"
+      render json: { error: "Not Authorized" }, status: :unauthorized
+    end
   end
 end

@@ -35,7 +35,7 @@
         v-model="product.price"
         label="Price ($)"
         type="number"
-        :rules="[requireRules(), minNumber(0), maxNumber(100)]"
+        :rules="[requireRules(), minNumber(0), maxNumber(999999999999)]"
         clearable
       ></v-text-field>
       <v-text-field

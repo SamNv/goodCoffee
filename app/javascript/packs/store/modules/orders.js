@@ -1,91 +1,101 @@
+import { securedAxiosInstance } from '../../api/httpClient.js'
+import { flatPayload } from "../../utils/store"
+import { removeCart } from '../../utils/localStorage';
+
 const state = {
-  orders: [
-    {
-      name: "Frozen Yogurt",
-      email: "Frozen Yogurt@gmail.com",
-      orderDate: "2021-01-26 10:30",
-      status: "processing",
-      total: 14.0,
-    },
-    {
-      name: "Ice cream sandwich",
-      email: "Ice cream sandwich@gmail.com",
-      orderDate: "2021-01-26 10:30",
-      status: "processing",
-      total: 14.3,
-    },
-    {
-      name: "Eclair",
-      email: "Eclair@gmail.com",
-      orderDate: "2021-01-26 10:30",
-      status: "processing",
-      total: 16.0,
-    },
-    {
-      name: "Cupcake",
-      email: "Cupcake@gmail.com",
-      orderDate: "2021-01-26 10:30",
-      status: "pending",
-      total: 14.3,
-    },
-    {
-      name: "Gingerbread",
-      email: "Gingerbread@gmail.com",
-      orderDate: "2021-01-27 10:30",
-      status: "pending",
-      total: 13.9,
-    },
-    {
-      name: "Jelly bean",
-      email: "Jelly bean@gmail.com",
-      orderDate: "2021-01-27 10:30",
-      status: "pending",
-      total: 10.0,
-    },
-    {
-      name: "Lollipop",
-      email: "Lollipop@gmail.com",
-      orderDate: "2021-01-27 10:30",
-      status: "pending",
-      total: 10,
-    },
-    {
-      name: "Honeycomb",
-      email: "Honeycomb@gmail.com",
-      orderDate: "2021-01-27 10:30",
-      status: "complete",
-      total: 16.5,
-    },
-    {
-      name: "Donut",
-      email: "Donut@gmail.com",
-      orderDate: "2021-01-27 10:30",
-      status: "complete",
-      total: 14.9,
-    },
-    {
-      name: "KitKat",
-      email: "KitKat@gmail.com",
-      orderDate: "2021-01-26 10:30",
-      status: "complete",
-      total: 17,
-    },
-  ]
+  orders: [],
+  order: {}
 }
 
 const getters = {
   getOrders(state) {
     return state.orders
+  },
+  getOrder(state) {
+    return state.order
   }
 }
 
 
 const mutations = {
-
+  getOrders(state, payload) {
+    state.orders = flatPayload(payload).reverse().map(o => {
+      return {
+        id: o.id,
+        name: o.user.first_name + " " + o.user.last_name,
+        email: o.user.email,
+        phone: o.phone,
+        address: o.address,
+        orderDate: o.created_at,
+        total: o.purchase_order,
+        status: o.status
+      }
+    })
+  },
+  getOrder(state, payload) {
+    state.order = flatPayload(payload)
+    state.order.order_details = state.order.order_details.map(o => {
+      return {
+        id: o.id,
+        price: o.price,
+        discount: o.discount,
+        quantity: o.quantity,
+        name: o.product.name,
+        image_url: o.product.image_url,
+      }
+    })
+  },
+  create(state, payload) {
+    state.orders.unshift(flatPayload(payload))
+    removeCart()
+  },
+  update(state, payload) {
+    let order = flatPayload(payload)
+    order = {
+      id: order.id,
+      name: order.user.first_name + " " + order.user.last_name,
+      email: order.user.email,
+      phone: order.phone,
+      address: order.address,
+      orderDate: order.created_at,
+      total: order.purchase_order,
+      status: order.status
+    }
+    state.orders = state.orders.map(o => {
+      if (o.id === order.id) {
+        return order;
+      }
+      return o;
+    })
+  },
+  delete(state, payload) {
+    const order = flatPayload(payload)
+    state.orders = state.orders.filter(o => o.id != order.id)
+  }
 }
 
 const actions = {
-
+  async getOrders({ commit }) {
+    const res = await securedAxiosInstance.get('/api/orders')
+    commit("getOrders", res)
+  },
+  async getOderById({ commit }, id) {
+    const res = await securedAxiosInstance.get(`/api/orders/${id}`)
+    commit("getOrder", res)
+  },
+  async create({ commit }, params) {
+    const res = await securedAxiosInstance.post('/api/orders', params)
+    commit("create", res)
+  },
+  async update({ commit }, { id, params }) {
+    const res = await securedAxiosInstance.put(`/api/orders/${id}`, params)
+    commit("update", res)
+    commit("getOrder", res)
+  },
+  async delete({ commit }, id) {
+    const res = await securedAxiosInstance.delete(`/api/orders/${id}`)
+    commit("delete", res)
+  },
 }
 
 

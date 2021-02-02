@@ -1,0 +1,1 @@
+migrate: bundle exec rails db:migrate:reset db:seed

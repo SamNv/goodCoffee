@@ -1,6 +1,8 @@
 <template>
   <v-app id="app">
-    <component :is="this.$route.name == 'AdminPage' ? 'AdminHeader': 'Header'"></component>
+    <component
+      :is="this.$route.name == 'AdminPage' ? 'AdminHeader' : 'Header'"
+    ></component>
     <v-main class="mt-12">
       <router-view />
     </v-main>
@@ -30,6 +32,11 @@ import Audio from "./packs/components/home/Audio";
 
 export default {
   name: "App",
+  async created() {
+    if (!!localStorage.signedIn) {
+      await this.$store.dispatch("auth/fetchCurrentUser");
+    }
+  },
   data: () => ({
     items: [
       { title: "Click Me" },
@@ -42,9 +49,9 @@ export default {
     toastIndex() {
       return this.$store.getters["toast/index"];
     },
-    // isNotAdminPage(){
-    //   return this.$route.name != 'AdminPage'
-    // }
+    currentUser() {
+      return this.$store.getters["auth/currentUser"];
+    }
   },
   components: {
     GlobalToast,
@@ -129,7 +136,7 @@ p {
 .slide-fade-leave-active {
   transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
 }
-.slide-fade-enter{
+.slide-fade-enter {
   transform: translateX(50px);
   opacity: 0;
 }

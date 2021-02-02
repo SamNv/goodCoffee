@@ -53,11 +53,11 @@ const actions = {
     commit('setCategoryInfo', res)
   },
   async update({ commit }, { id, category }) {
-    const res = await plainAxiosInstance.put(`/api/categories/${id}`, { category: category })
+    const res = await securedAxiosInstance.put(`/api/categories/${id}`, { category: category })
     commit("update", res)
   },
   async create({ commit }, category) {
-    const res = await plainAxiosInstance.post('/api/categories', { category: category })
+    const res = await securedAxiosInstance.post('/api/categories', { category: category })
     commit("create", res)
   },
   setCategory({ commit }, data) {

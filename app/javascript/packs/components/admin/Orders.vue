@@ -10,17 +10,48 @@
       ></v-text-field>
     </v-card-title>
     <v-data-table :headers="headers" :items="orders" :search="search">
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-spacer></v-spacer>
+          <v-dialog v-model="dialog" max-width="600px">
+            <OrderForm />
+          </v-dialog>
+          <v-dialog v-model="dialogDelete" max-width="500px">
+            <v-card class="pa-6">
+              <p class="mb-2">Are you sure you want to delete this item?</p>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="blue darken-1"
+                  rounded
+                  text
+                  @click="dialogDelete = false"
+                  >Cancel</v-btn
+                >
+                <v-btn
+                  color="blue darken-1"
+                  rounded
+                  text
+                  @click="deleteItemConfirm"
+                  >OK</v-btn
+                >
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-toolbar>
+      </template>
+      <template v-slot:item.orderDate="{ item }">
+        <p>{{ formatDate(item.orderDate) }}</p>
+      </template>
       <template v-slot:item.status="{ item }">
-        <v-icon :color="status[item.status].color">{{
+        <v-icon v-if="item.status" :color="status[item.status].color">{{
           status[item.status].icon
         }}</v-icon>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon small class="mr-2 blue--text" @click="editItem(item)">
+        <v-icon small class="mr-2 blue--text" @click="show(item)">
           mdi-eye
-        </v-icon>
-        <v-icon small class="mr-2 orange--text" @click="editItem(item)">
-          mdi-pencil
         </v-icon>
         <v-icon small @click="deleteItem(item)" class="red--text">
           mdi-close
@@ -31,6 +62,9 @@
 </template>
 
 <script>
+import OrderForm from "../../components/admin/order/OrderForm";
+import moment from "moment";
+
 export default {
   data: () => ({
     dialog: false,
@@ -44,21 +78,14 @@ export default {
         filterable: true,
         value: "name",
       },
+      { text: "Phone", value: "phone" },
+      { text: "Address", value: "address" },
       { text: "Email", value: "email" },
       { text: "Order Date", value: "orderDate" },
       { text: "Total", value: "total" },
       { text: "Status", value: "status" },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: "Actions", value: "actions", sortable: true },
     ],
-    desserts: [],
-    editedIndex: -1,
-    editedItem: {
-      name: "",
-      email: "",
-      orderDate: "",
-      total: "",
-      status: "",
-    },
     defaultItem: {
       name: "",
       email: "",
@@ -80,66 +107,51 @@ export default {
         icon: "mdi-check-circle",
       },
     },
-    orders: []
+    removeItem: {},
+    order: {},
   }),
-  mounted(){
-      this.orders = this.$store.getters["orders/getOrders"]
+  components: {
+    OrderForm,
   },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-  },
-
-  watch: {
-    dialog(val) {
-      val || this.close();
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
+    orders() {
+      return [...this.$store.getters["orders/getOrders"]];
     },
   },
   methods: {
-    editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
+    formatDate(time) {
+      return moment(time).format("YYYY/MM/DD hh:mm");
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
+      this.removeItem = item;
     },
 
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-      } else {
-        this.desserts.push(this.editedItem);
+    async show(item) {
+      try {
+        this.dialog = true;
+        this.$store.dispatch("orders/getOderById", item.id);
+      } catch (e) {
+        throw e;
       }
-      this.close();
+    },
+    async deleteItemConfirm() {
+      try {
+        await this.$store.dispatch("orders/delete", this.removeItem.id);
+        this.$store.dispatch("toast/show", {
+          message: "The order was deleted successfully!",
+        });
+        this.dialogDelete = false;
+      } catch (e) {
+        this.$store.dispatch("toast/showError", {
+          message: "Failed to delete",
+        });
+        throw e;
+      }
     },
   },
 };

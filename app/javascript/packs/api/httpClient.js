@@ -14,8 +14,7 @@ const plainAxiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
-    'X-CSRF-TOKEN': localStorage.csrf
+    'Content-Type': 'application/json'
   }
 })
 
@@ -31,7 +30,7 @@ securedAxiosInstance.interceptors.request.use(config => {
 })
 
 securedAxiosInstance.interceptors.response.use(null, error => {
-  if (error.response && error.response.config && error.response.status === 401) {
+  if (error.response && error.response.config && (error.response.status === 401 || error.response.status === 403)) {
     // If 401 by expired access cookie, we do a refresh request
     return plainAxiosInstance.post('/api/refresh', {}, { headers: { 'X-CSRF-TOKEN': localStorage.csrf } })
       .then(response => {

@@ -71,7 +71,7 @@ export default {
     addToCart: function(item) {
       this.$store.dispatch("cart/addProduct", item);
       this.$store.dispatch("toast/show", {
-        message: item.name + " is added to cart",
+        message: item.name + " was added to cart",
       });
     },
   },

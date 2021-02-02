@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="currentUser.role == 'admin'">
     <v-row v-if="loading">
       <v-progress-circular
         indeterminate
@@ -22,12 +22,10 @@
 
       <v-navigation-drawer v-model="drawer" app clipped class="nav">
         <v-list-item>
-          <v-list-item-avatar>
-            <v-img src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
-          </v-list-item-avatar>
-
           <v-list-item-content>
-            <v-list-item-title>John Leider</v-list-item-title>
+            <v-list-item-title>{{
+              currentUser.first_name + " " + currentUser.last_name
+            }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -97,7 +95,13 @@ export default {
     }
     await this.$store.dispatch("categories/getCategories");
     await this.$store.dispatch("products/getProducts");
+    await this.$store.dispatch("orders/getOrders");
     this.loading = false;
+  },
+  computed: {
+    currentUser() {
+      return this.$store.getters["auth/currentUser"];
+    },
   },
   data: () => ({
     drawer: null,
