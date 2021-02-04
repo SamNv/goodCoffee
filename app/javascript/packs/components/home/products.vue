@@ -20,7 +20,11 @@
         <v-avatar size="50">
           <v-img
             class="product-img"
-            src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
+            :src="
+              item.image_url
+                ? item.image_url
+                : 'https://dummyimage.com/600x400/000/fff'
+            "
           ></v-img>
         </v-avatar>
       </v-badge>
@@ -29,12 +33,7 @@
           <span class="mr-auto clickable">{{ item.name }}</span>
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                v-bind="attrs"
-                v-on="on"
-                @click="addToCart(item.name)"
-              >
+              <v-btn icon v-bind="attrs" v-on="on" @click="addToCart(item)">
                 <v-icon color="amber accent-32">
                   mdi-cart-plus
                 </v-icon>
@@ -69,9 +68,10 @@ export default {
     show: true,
   }),
   methods: {
-    addToCart: function(name) {
+    addToCart: function(item) {
+      this.$store.dispatch("cart/addProduct", item);
       this.$store.dispatch("toast/show", {
-        message: name + " is added to cart",
+        message: item.name + " was added to cart",
       });
     },
   },

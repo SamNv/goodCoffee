@@ -1,6 +1,13 @@
 <template>
-  <div>
-    <v-sheet height="calc(100% - 84px)">
+  <div v-if="currentUser.role == 'admin'">
+    <v-row v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        class="mb-5 progress-circular"
+      ></v-progress-circular>
+    </v-row>
+    <v-sheet height="calc(100% - 84px)" v-if="!loading">
       <v-container fluid class="">
         <v-row>
           <v-app-bar-nav-icon
@@ -15,12 +22,10 @@
 
       <v-navigation-drawer v-model="drawer" app clipped class="nav">
         <v-list-item>
-          <v-list-item-avatar>
-            <v-img src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
-          </v-list-item-avatar>
-
           <v-list-item-content>
-            <v-list-item-title>John Leider</v-list-item-title>
+            <v-list-item-title>{{
+              currentUser.first_name + " " + currentUser.last_name
+            }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -84,14 +89,24 @@ export default {
     Users,
     Categories,
   },
-  mounted() {
+  async mounted() {
     if (this.$route.query.q) {
       this.component = this.$route.query.q;
     }
+    await this.$store.dispatch("categories/getCategories");
+    await this.$store.dispatch("products/getProducts");
+    await this.$store.dispatch("orders/getOrders");
+    this.loading = false;
+  },
+  computed: {
+    currentUser() {
+      return this.$store.getters["auth/currentUser"];
+    },
   },
   data: () => ({
     drawer: null,
     component: "Products",
+    loading: true,
     items: [
       { title: "Products", icon: "mdi-view-dashboard", component: "Products" },
       {
@@ -110,5 +125,11 @@ export default {
 .nav {
   top: 48px !important;
   height: calc(100% - 84px) !important;
+}
+
+.progress-circular {
+  top: 50%;
+  left: 50%;
+  position: absolute;
 }
 </style>

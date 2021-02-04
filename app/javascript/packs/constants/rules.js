@@ -9,7 +9,7 @@ export const minRules = value => {
 }
 
 export const maxRules = value => {
-    return v => (v && v.length < value) || ("Must be less than " + value) 
+    return v => (v && v.length < value) || ("Must be less than " + value)
 }
 
 
@@ -20,4 +20,8 @@ export const minNumber = value => {
 
 export const maxNumber = value => {
     return v => v ? (v && v < value) || ("Must be less then or equal to " + value) : true
+}
+
+export const phoneFormat = (value) => {
+    return (v) => (v && (v.match(/\d/g).length === 10 || v.match(/\d/g).length === 11)) || "Phone number format is invalid"
 }

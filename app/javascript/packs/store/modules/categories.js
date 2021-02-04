@@ -13,7 +13,7 @@ const getters = {
   getCategory(state) {
     return state.category
   },
-  getCategoryInfo(state){
+  getCategoryInfo(state) {
     return state.categoryInfo
   }
 }
@@ -39,6 +39,7 @@ const mutations = {
   },
   setCategoryInfo(state, payload) {
     state.categoryInfo = flatPayload(payload)
+    state.categoryInfo["products"] = state.categoryInfo["products"].filter(p => p.status === 'active')
   }
 }
 
@@ -52,11 +53,11 @@ const actions = {
     commit('setCategoryInfo', res)
   },
   async update({ commit }, { id, category }) {
-    const res = await plainAxiosInstance.put(`/api/categories/${id}`, { category: category })
+    const res = await securedAxiosInstance.put(`/api/categories/${id}`, { category: category })
     commit("update", res)
   },
   async create({ commit }, category) {
-    const res = await plainAxiosInstance.post('/api/categories', { category: category })
+    const res = await securedAxiosInstance.post('/api/categories', { category: category })
     commit("create", res)
   },
   setCategory({ commit }, data) {

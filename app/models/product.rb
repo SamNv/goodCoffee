@@ -3,6 +3,8 @@ class Product < ApplicationRecord
   before_save :default_values
 
   belongs_to :category
+  has_many :order_details
+  has_many :orders, through: :order_details
 
   enum status: { inactive: 0, active: 1 }
   validates :name, length: { minimum: 1, maximum: 40 }, presence: true
@@ -25,5 +27,6 @@ class Product < ApplicationRecord
     self.status ||= 1
     self.price ||= 0
     self.discount ||= 0
+    self.name = self.name.upcase
   end
 end

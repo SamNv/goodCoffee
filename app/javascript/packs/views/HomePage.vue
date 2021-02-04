@@ -2,20 +2,30 @@
   <div id="home" class="py-10">
     <p class="text-center menu-title mb-5">Menu</p>
     <div class="menu-list mx-auto">
-      <ul class="px-0 mb-15">
+      <ul class="px-0 mb-15 d-flex flex-wrap justify-center px-10">
         <li
-          class="menu-item clickable"
+          class="menu-item clickable ma-4"
           :class="tab == index + 1 ? 'orange--text' : ''"
           v-for="(item, index) in categories"
           :key="index"
           @click="getProducts(item.id, index)"
         >
-          {{ item.name }}
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <span color="primary" dark v-bind="attrs" v-on="on" class="px-5">
+                {{ item.name }}
+              </span>
+            </template>
+            <span> {{ item.name }}</span>
+          </v-tooltip>
         </li>
       </ul>
       <div class="content">
         <transition name="list" appear>
-          <Products :products="category.products" :key="componentIndex" />
+          <Products
+            :products="category.products"
+            :key="componentIndex"
+          />
         </transition>
       </div>
     </div>
@@ -31,9 +41,6 @@ export default {
       this.$store.getters["categories/getCategories"][0].id
     );
   },
-  created() {
-    console.log(this.categories[0]);
-  },
   computed: {
     categories() {
       return [...this.$store.getters["categories/getCategories"]];
@@ -45,40 +52,6 @@ export default {
   data: () => ({
     tab: 1,
     componentIndex: 1,
-    coffeeList: [
-      {
-        name: "Sweet Cold ",
-        price: 10,
-      },
-      {
-        name: "Sweet Brew2",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew3",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew4",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew5",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew6",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew7",
-        price: 10,
-      },
-      {
-        name: "Sweet Cold Brew8",
-        price: 10,
-      },
-    ],
   }),
   components: {
     Products,
@@ -114,7 +87,9 @@ export default {
     &-item {
       list-style: none;
       text-transform: capitalize;
-      transition: color 1s ease;
+      transition: color 0.5s ease;
+      border: 2px solid #af992f73;
+      border-radius: 25px;
       &:hover {
         color: orange;
       }

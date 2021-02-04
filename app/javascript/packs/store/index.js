@@ -14,7 +14,8 @@ const moduleNames = [
   "products",
   "orders",
   "users",
-  "categories"
+  "categories",
+  "cart"
 ];
 
 moduleNames.forEach(name => {

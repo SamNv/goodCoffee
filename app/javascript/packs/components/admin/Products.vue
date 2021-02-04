@@ -29,6 +29,7 @@
               :dialog="dialog"
               @close="dialog = $event"
               :action="action"
+              :key="productFormIndex"
             />
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
@@ -57,7 +58,11 @@
           <v-avatar size="40">
             <v-img
               class="product-image"
-              src="https://phunugioi.com/wp-content/uploads/2020/02/hinh-anh-ly-cafe-dep.jpg"
+              :src="
+                item.image_url
+                  ? item.image_url
+                  : 'https://dummyimage.com/600x400/000/fff'
+              "
             ></v-img>
           </v-avatar>
           <span class="ml-7"> {{ item.name }}</span>
@@ -78,14 +83,11 @@
 <script>
 import ProductForm from "./product/ProductForm";
 export default {
-  mounted() {
-    this.$store.dispatch("categories/getCategories");
-    this.$store.dispatch("products/getProducts");
-  },
   components: {
     ProductForm,
   },
   data: () => ({
+    productFormIndex: 0,
     dialog: false,
     dialogDelete: false,
     search: "",
@@ -120,11 +122,13 @@ export default {
   },
   methods: {
     editItem(item) {
+      this.productFormIndex += 1;
       this.$store.dispatch("products/setProduct", item);
       this.action = "edit";
       this.dialog = true;
     },
     createItem() {
+      this.productFormIndex += 1;
       this.$store.dispatch("products/setProduct", this.defaultItem);
       this.action = "new";
       this.dialog = true;
@@ -137,12 +141,11 @@ export default {
 
     async deleteItemConfirm() {
       try {
-        const params = {
-          status: 0,
-        };
+        let formData = new FormData();
+        formData.append("status", "inactive");
         await this.$store.dispatch("products/update", {
           id: this.product.id,
-          params: params,
+          params: formData,
         });
         this.$store.dispatch("toast/show", {
           message: this.product.name + " was deleted successfully!",

@@ -1,4 +1,4 @@
-import { securedAxiosInstance, plainAxiosInstance } from '../../api/httpClient.js'
+import { securedAxiosInstance } from '../../api/httpClient.js'
 import { flatPayload } from "../../utils/store"
 const state = {
   products: [],
@@ -7,14 +7,17 @@ const state = {
 
 const getters = {
   getProducts(state) {
-    return state.products.filter(c => c.status == 'active').map(p => {
+    let products = state.products.filter(c => c.status == 'active')
+    return products.map(p => {
       return {
         id: p.id,
         name: p.name,
         price: p.price,
         discount: p.discount,
         category: p.category.name,
-        category_id: p.category_id
+        category_id: p.category_id,
+        image_url: p.image_url,
+        status: p.status
       }
     })
   },
@@ -46,15 +49,15 @@ const mutations = {
 
 const actions = {
   async getProducts({ commit }) {
-    const res = await plainAxiosInstance.get("/api/products")
+    const res = await securedAxiosInstance.get("/api/products")
     commit("getProducts", res)
   },
   async create({ commit }, params) {
-    const res = await plainAxiosInstance.post('/api/products', { product: params })
+    const res = await securedAxiosInstance.post('/api/products', params, { headers: { "Content-Type": "multipart/form-data" } })
     commit("create", res)
   },
   async update({ commit }, { id, params }) {
-    const res = await plainAxiosInstance.put(`/api/products/${id}`, { product: params })
+    const res = await securedAxiosInstance.put(`/api/products/${id}`, params, { headers: { "Content-Type": "multipart/form-data" } })
     commit("update", res)
   },
   setProduct({ commit }, data) {

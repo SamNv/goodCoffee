@@ -1,11 +1,13 @@
 <template>
-  <div class="header">
+  <div class="header" v-if="currentUser.role == 'admin'">
     <v-toolbar dense color="black white--text px-md-6">
       <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
 
       <v-toolbar-title class="header-title">
         <v-icon>mdi-pot-steam</v-icon>
-        <span>{{ $t("common.header_title") }}</span>
+        <router-link to="/home" class="text-decoration-none">
+          <span>{{ $t("common.header_title") }}</span>
+        </router-link>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -59,10 +61,7 @@
             <v-tab-item>
               <v-card class="px-4">
                 <v-card-text>
-                  <LoginForm
-                    :dialog="dialog"
-                    @changeDialog="dialog = $event"
-                  />
+                  <LoginForm :dialog="dialog" @changeDialog="dialog = $event" />
                 </v-card-text>
               </v-card>
             </v-tab-item>
@@ -80,6 +79,9 @@ export default {
     logined() {
       return this.$store.getters["auth/logined"];
     },
+    currentUser() {
+      return this.$store.getters["auth/currentUser"];
+    },
   },
   data: () => ({
     dialog: false,
@@ -88,12 +90,13 @@ export default {
     tabs: [{ name: "Login", icon: "mdi-account" }],
   }),
   components: {
-    LoginForm
+    LoginForm,
   },
   methods: {
     async logout() {
       try {
         await this.$store.dispatch("auth/logout");
+        this.$store.dispatch("cart/setItems", []);
         this.$store.dispatch("toast/show", {
           message: "You have been logged out successfully !!",
         });
@@ -102,6 +105,8 @@ export default {
           message: "You cannot log out",
         });
         throw e;
+      } finally {
+        this.$router.replace({ path: "/home" });
       }
     },
   },

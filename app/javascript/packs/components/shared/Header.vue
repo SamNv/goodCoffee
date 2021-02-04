@@ -1,8 +1,6 @@
 <template>
   <div class="header">
     <v-toolbar dense color="black white--text px-md-6">
-      <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
-
       <v-toolbar-title class="header-title">
         <v-icon>mdi-pot-steam</v-icon>
         <span>{{ $t("common.header_title") }}</span>
@@ -33,7 +31,106 @@
       >
         {{ $t("common.register") }}
       </p>
-
+      <router-link
+        to="/admin"
+        v-if="currentUser.role == 'admin'"
+        class="text-decoration-none white--text"
+      >
+        <p class="clickable ml-4 d-none d-sm-flex" dark>
+          Manage Page
+        </p>
+      </router-link>
+      <v-dialog
+        transition="dialog-bottom-transition"
+        max-width="600"
+        v-if="logined"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <p
+            class="clickable ml-4 d-none d-sm-flex"
+            v-bind="attrs"
+            v-on="on"
+            dark
+          >
+            Order History
+          </p>
+        </template>
+        <template v-slot:default="dialog">
+          <v-card>
+            <v-toolbar color="primary" dark>Your order history</v-toolbar>
+            <v-card-text
+              v-if="currentUserOrders && currentUserOrders.length > 0"
+            >
+              <div
+                class="order-list px-2 py-5"
+                v-for="(order, index) in currentUserOrders"
+                :key="index"
+              >
+                <div class="order-item">
+                  <p class="d-flex align-center">
+                    <v-btn
+                      rounded
+                      class="white--text mr-4"
+                      :color="orderStatus[order.status].color"
+                    >
+                      <v-icon class="mr-1">{{
+                        orderStatus[order.status].icon
+                      }}</v-icon>
+                      {{ order.status }}
+                    </v-btn>
+                    {{ formatDate(order.created_at) }}
+                  </p>
+                  <p class="text-start mt-2">
+                    <span class="font-weight-bold">Phone:</span>
+                    {{ order.phone }}
+                  </p>
+                  <p class="text-start mt-2">
+                    <span class="font-weight-bold">Address:</span>
+                    {{ order.address }}
+                  </p>
+                  <v-data-table
+                    :headers="headers"
+                    :items="order.order_details"
+                    hide-default-footer
+                  >
+                    <template v-slot:item.price="{ item }">
+                      <p class="orange--text">{{ item.price }}</p>
+                    </template>
+                    <template v-slot:item.discount="{ item }">
+                      <p class="red--text">- {{ item.discount }}%</p>
+                    </template>
+                    <template v-slot:item.name="{ item }">
+                      <div class="d-flex align-center">
+                        <v-avatar size="40">
+                          <v-img
+                            class="product-image"
+                            :src="
+                              item.product.image_url
+                                ? item.product.image_url
+                                : 'https://dummyimage.com/600x400/000/fff'
+                            "
+                          ></v-img>
+                        </v-avatar>
+                        <span class="ml-7"> {{ item.product.name }}</span>
+                      </div>
+                    </template>
+                  </v-data-table>
+                  <div class="font-weight-bold">
+                    <span>Total: </span>
+                    <span class="text-decoration-underline"
+                      >{{ order.purchase_order }}$</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </v-card-text>
+            <v-card-text v-else class="mt-7">
+              Your order list is empty!!
+            </v-card-text>
+            <v-card-actions class="justify-end"> </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
       <p
         class="clickable ml-4 d-none d-sm-flex"
         dark
@@ -42,12 +139,11 @@
       >
         {{ $t("common.logout") }}
       </p>
-
       <v-badge
         top
         offset-y="15"
         color="orange darken-1"
-        content="6"
+        :content="itemsInCart"
         class="mr-5 ml-4 clickable"
       >
         <v-icon
@@ -55,6 +151,7 @@
           @click.stop="
             cartModal = true;
             orderStep = 1;
+            cartIndex += 1;
           "
           >mdi-cart-variant</v-icon
         >
@@ -82,11 +179,6 @@
         </template>
 
         <v-list class="orange">
-          <v-list-item>
-            <v-list-item-title class="white--text clickable"
-              >Profile</v-list-item-title
-            >
-          </v-list-item>
           <v-list-item @click="logout">
             <v-list-item-title class="white--text">Logout</v-list-item-title>
           </v-list-item>
@@ -128,13 +220,22 @@
         </div>
       </v-dialog>
       <v-dialog v-model="cartModal" max-width="600px" min-width="360px">
-        <Cart />
+        <Cart
+          v-if="cartModal"
+          :key="cartIndex"
+          :cartModal="cartModal"
+          @changeCartModal="cartModal = $event"
+          @changeDialog="dialog = $event"
+          @orderStep="orderStep = $event"
+        />
       </v-dialog>
     </v-toolbar>
   </div>
 </template>
 
 <script>
+import moment from "moment";
+
 import LoginForm from "../authentication/LoginForm";
 import RegisterForm from "../authentication/RegisterForm";
 import Cart from "../cart/index";
@@ -143,14 +244,67 @@ export default {
     logined() {
       return this.$store.getters["auth/logined"];
     },
+    itemsInCart() {
+      let count = this.$store.getters["cart/getItems"].length;
+      return count == 0 ? "0" : count;
+    },
+    currentUser() {
+      return this.$store.getters["auth/currentUser"];
+    },
+    currentUserOrders() {
+      return this.$store.getters["auth/currentUser"].orders.reverse();
+    },
+    cartModal: {
+      get() {
+        return this.innerCartModal;
+      },
+      set(value) {
+        if (this.orderStep == 3 && !value) {
+          this.$store.dispatch("cart/setItems", []);
+        }
+        this.innerCartModal = value;
+      },
+    },
   },
   data: () => ({
+    cartIndex: 0,
     dialog: false,
-    cartModal: false,
+    innerCartModal: false,
+    orderStep: 1,
     tab: 0,
     tabs: [
       { name: "Login", icon: "mdi-account" },
       { name: "Register", icon: "mdi-account-outline" },
+    ],
+    orderStatus: {
+      processing: {
+        color: "blue",
+        icon: "mdi-autorenew",
+      },
+      pending: {
+        color: "orange",
+        icon: "mdi-clock-outline",
+      },
+      complete: {
+        color: "green",
+        icon: "mdi-check-circle",
+      },
+    },
+    headers: [
+      { text: "Name", value: "name", sortable: false, filterable: false },
+      { text: "Price", value: "price", sortable: false, filterable: false },
+      {
+        text: "Discount",
+        value: "discount",
+        sortable: false,
+        filterable: false,
+      },
+      {
+        text: "Quantity",
+        value: "quantity",
+        sortable: false,
+        filterable: false,
+      },
     ],
   }),
   components: {
@@ -162,6 +316,7 @@ export default {
     async logout() {
       try {
         await this.$store.dispatch("auth/logout");
+        this.$store.dispatch("cart/setItems", []);
         this.$store.dispatch("toast/show", {
           message: "You have been logged out successfully !!",
         });
@@ -171,6 +326,9 @@ export default {
         });
         throw e;
       }
+    },
+    formatDate(time) {
+      return moment(time).format("YYYY/MM/DD hh:mm");
     },
   },
 };
