@@ -51,7 +51,7 @@ export default {
     },
     currentUser() {
       return this.$store.getters["auth/currentUser"];
-    }
+    },
   },
   components: {
     GlobalToast,

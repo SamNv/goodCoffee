@@ -34,8 +34,8 @@ const actions = {
   async login({ commit }, data) {
     try {
       const res = await plainAxiosInstance.post("/api/signin", data)
-      const user = await securedAxiosInstance.get("/api/me")
       saveToken(res)
+      const user = await securedAxiosInstance.get("/api/me")
       commit("login", user)
     } catch (e) {
       removeToken()
@@ -57,8 +57,8 @@ const actions = {
   async createUser({ commit }, data) {
     try {
       const res = await plainAxiosInstance.post("/api/signup", data)
-      const user = await securedAxiosInstance.get("/api/me")
       saveToken(res)
+      const user = await securedAxiosInstance.get("/api/me")
       commit("login", user)
     } catch (e) {
       removeToken()

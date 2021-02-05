@@ -69,7 +69,12 @@
 </template>
 
 <script>
-import { emailRules, requireRules, minRules, maxRules } from "../../constants/rules";
+import {
+  emailRules,
+  requireRules,
+  minRules,
+  maxRules,
+} from "../../constants/rules";
 
 export default {
   computed: {
@@ -94,7 +99,7 @@ export default {
       email: "",
       password: "",
       password_confirmation: "",
-    }
+    },
   }),
   methods: {
     async createUser() {
@@ -107,8 +112,7 @@ export default {
           this.user.password = "";
           this.user.password_confirmation = "";
           this.$store.dispatch("toast/show", {
-            message:
-              "You have been created the account successfully",
+            message: "You have been created the account successfully",
           });
           this.$emit("changeDialog", false);
         } catch (e) {
